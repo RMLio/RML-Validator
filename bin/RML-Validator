@@ -1,0 +1,57 @@
+compile () {
+  if [ ! -d "RDFUnit" ]; then
+    echo "Cloning RDFUnit..."
+    git clone https://github.com/AKSW/RDFUnit.git
+
+    echo "Installing RDFUnit..."
+    cd RDFUnit
+    mvn clean install -DskipTests
+    cd ..
+  fi
+  
+  echo "Cloning RML-Mapper..."
+  git clone --recursive https://github.com/RMLio/RML-Mapper.git 
+  echo "Compiling RML-Mapper..."
+  cd RML-Mapper
+  mvn clean install -DskipTests
+  cd ..
+
+  echo "Cloning RML-RDFUnit..."
+  git clone --recursive https://github.com/RMLio/RML-RDFUnit.git
+  echo "Compiling RML-RDFUnit..."
+  cd RML-RDFUnit
+  mvn clean install -DskipTests
+  cd ..
+  
+  echo "Compiling RML-Validator..."
+  mvn clean install -DskipTests
+
+  cp RML-RDFUnit/target/RML-RDFUnit-1.0.jar RML-Validator.jar
+  echo "RML-Validator ready to be used..."
+  java -jar RML-Validator.jar -h
+}
+
+execute () {
+  #check if compiled
+  if [ ! -d "RML-RDFUnit/target" ]; then
+    compile
+  fi
+  
+  #check if RML-Validator.jar exists
+  if [ ! -d "RML-Validator.jar" ]; then
+    cp RML-RDFUnit/target/RML-RDFUnit-0.2.jar RML-Validator.jar
+  fi
+  
+  #excute the mapping document
+  echo "Running RML-Validator started..."
+  java -jar RML-Validator.jar $*
+  #echo "Running RML-Validator stopped..."
+}
+
+if [ "$#" -eq 0 ] ; then
+  echo "Compilation mode"
+  compile
+else
+  echo "Execution mode"
+  execute $*
+fi
