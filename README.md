@@ -10,7 +10,7 @@ Clone
 
 You can clone the RML- Validator (and its subprojects)
 
-    git clone git@git.mmlab.be:rml/RML-Validator.git
+    git clone https://github.com/RMLio/RML-Validator.git
 
 Installation
 ------------
